@@ -54,6 +54,7 @@ let guessed = false;
 let playersReady: Record<string, string> = {};
 let playersCount = 0;
 let hint = "";
+let triesCounter: Record<string, number> = {};
 
 io.on("connection", (socket) => {
   socket.on("join", () => {
@@ -100,6 +101,12 @@ io.on("connection", (socket) => {
       feedbacks[socketId] = [];
     }
 
+    if (triesCounter[socketId]) {
+      triesCounter[socketId]++;
+    } else {
+      triesCounter[socketId] = 1;
+    }
+
     feedbacks[socketId].push({
       guess,
       socketId,
@@ -117,7 +124,7 @@ io.on("connection", (socket) => {
       });
     }
 
-    io.to("game").emit("word-guess", feedbacks);
+    io.to("game").emit("word-guess", feedbacks, triesCounter);
 
     if (guess.toUpperCase() === currentWord.toUpperCase()) {
       io.to("game").emit("guessed", socketId);
@@ -130,6 +137,7 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     delete feedbacks[socket.id];
+    delete triesCounter[socket.id];
     socket.leave("game");
     playersCount--;
   });
