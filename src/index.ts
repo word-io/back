@@ -38,7 +38,7 @@ let currentWord = "";
 
 const fetchRandomWord = async () => {
   try {
-    const response = await fetch("http://127.0.0.1:5000/random-word");
+    const response = await fetch(`${process.env.FLASK_API_URL}/random-word`);
     const data: any = await response.json();
     currentWord = data.word;
     if (currentWord.length < 5) {
@@ -135,6 +135,6 @@ io.on("connection", (socket) => {
   });
 });
 
-httpServer.listen(3000, () => {
-  console.log("Server is listening on port 3000");
+httpServer.listen(4000, () => {
+  console.log("Server is listening on port 4000");
 });
